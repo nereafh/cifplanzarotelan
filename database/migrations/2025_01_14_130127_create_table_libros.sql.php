@@ -37,3 +37,10 @@ return new class extends Migration
         Schema::dropIfExists('libros');
     }
 };
+
+
+/*
+Después de crear la base de datos utilizar: php artisan migrate:fresh --seed
+para migrar las tablas
+
+*/

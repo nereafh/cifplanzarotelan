@@ -15,13 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'juanra',
-            'email' => 'juan_curbelo@cifpzonzamas.es',
-            'password' => Hash::make('password'),
-        ]);
-
+        // Esto significa: "Si no existe, créalo. Si existe, no hagas nada"
+        User::firstOrCreate(
+            ['email' => 'juan_curbelo@cifpzonzamas.es'],
+            [
+                'name' => 'juanra',
+                'password' => Hash::make('password'),
+            ]
+        );
+    
+        // Con los libros podemos hacer lo mismo o simplemente comentar la línea
+        // una vez que ya tengamos datos en la tabla.
+        $this->call(LibrosSeeder::class);
     }
 }
