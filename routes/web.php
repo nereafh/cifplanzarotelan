@@ -1,11 +1,10 @@
 <?php
-
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-
 use App\Http\Controllers\DatosController;
-use App\Http\Controllers\LibroController;
+use App\Http\Controllers\LibroController; //Para que funcionen las rutas
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -23,7 +22,10 @@ Route::middleware('auth')->group(function () {
 
 
 
-Route::get('/libros'       , [LibroController::class, 'listado'])->name('libros.listado');
+
+
+
+Route::get('/libros', [LibroController::class, 'listado'])->name('libros.listado');
 
 
 Route::get('/libro/{id}'            , [LibroController::class, 'mostrar'])->name('libros.mostrar');
@@ -31,6 +33,9 @@ Route::get('/libro/actualizar/{id}' , [LibroController::class, 'actualizar'])->n
 Route::get('/libro/eliminar/{id}'   , [LibroController::class, 'eliminar'])->name('libros.eliminar');
 Route::get('/libros/nuevo'          , [LibroController::class, 'alta'])->name('libros.alta');
 Route::post('/libros/nuevo'         , [LibroController::class, 'almacenar'])->name('libros.almacenar');
+
+
+
 
 
 Route::get('/admin', function () {

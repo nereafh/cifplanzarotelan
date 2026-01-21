@@ -17,7 +17,11 @@
         </tr>
 
     
-    @foreach ($libros as $libro)
+    @foreach ($libros as $libro) 
+    <!-- Uso del controlador en las vistas 
+    @foreach ($users as $user)
+        <p>{{ $user->name }}</p>
+    @endforeach -->
         
 
     <tr>
@@ -29,6 +33,7 @@
                 </div>
 
             </td>
+            
             <td style="">{{ $libro->nombre }}</td>
             <td style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $EDITORIALES[$libro->editorial] }}</td> 
             <td>{{ $libro->autor }}</td> 

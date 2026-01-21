@@ -1,11 +1,14 @@
 <?php
+//php artisan make:model NombreDelModelo
 
+//Estrucutura de la tabla: php artisan make:migration create_nombre_de_la_tabla_table
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class Libro extends Model
 {
+    //Estos son las opciones que se van a poder elegir, el usuario no puede poner otras
     const GENEROS = [
          'FA' => 'Fantasía'
         ,'RM' => 'Realismo mágico'

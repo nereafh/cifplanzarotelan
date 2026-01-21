@@ -1,137 +1,95 @@
 <?php
 
+//Crear controlador: php artisan make:controller NombreDelControlador
+/*
+Organiza la lógica de toda la app en métodos/funciones, manejan las peticiones HTTP y responden
+Después ir a web.php a registrar las rutas 
+*/
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Models\Libro;
+use App\Models\Libro; //Para usar el modelo libro
 
 class LibroController extends Controller
 {
-    function listado()
+    //
+    public function index()
     {
-
-        $libros = Libro::paginate(7);
-
-        $GENEROS     = Libro::GENEROS;
-        $EDITORIALES = Libro::EDITORIALES;
-
-
-        return view('libros.libro',compact('libros','GENEROS','EDITORIALES'));
+        $libros = Libro::all();
+        return view('libros.index', ['libros' => $libros]);
     }
 
-
-    function formulario($oper='', $id='')
+    public function create(Request $request)
     {
-        $libro = empty($id)? new Libro() : Libro::find($id);
-        
-        $GENEROS     = Libro::GENEROS;
-        $EDITORIALES = Libro::EDITORIALES;
+        $data = ['exito' =>''];
 
-        return view('libros.formulario',compact('GENEROS','EDITORIALES','libro','oper'));
-    }
+        if ($request->isMethod('post')) {
 
-    function mostrar($id)
-    {
-        return $this->formulario('cons', $id);
-    }
-
-
-    function actualizar($id)
-    {
-        return $this->formulario('modi', $id);
-
-    }
-
-    function eliminar($id)
-    {
-        return $this->formulario('supr', $id);
-
-    }
-
-    function alta()
-    {
-        return $this->formulario();
-    }
-
-    function almacenar(Request $request)
-    {
-
-        if ($request->oper == 'supr')
-        {
-
-            $libro = Libro::find($request->id);
-            $libro->delete();
-
-            $salida = redirect()->route('libros.listado');
-        }
-        else
-        {
-            $validacion_genero = '';
-            foreach(Libro::GENEROS as $codigo_genero => $texto_genero)
-            {
-                $validacion_genero .= $codigo_genero .',';
-            }
-
-            $validacion_genero = substr($validacion_genero,0,-1);
-            
-            $validatedData = $request->validate([
-                'nombre'         => 'required|string|max:255',
-                'autor'          => 'required|string|max:255',
-                'anho'           => 'required|integer',
-                'genero'         => 'required|in:'.$validacion_genero,
-                'editorial'      => 'required',
-                'descripcion'    => 'required|string'
-            ], [
-                'nombre.required' => 'El nombre es obligatorio.',
-                'nombre.string'   => 'Debe ser de tipo cadena de texto.',
-                'nombre.max'      => 'Máximo 255 caracteres',
-
-                'nombre.max'      => 'Máximo 255 caracteres',
-
-
-
-                'autor.required' => 'El autor es obligatorio.',
-                'autor.string'   => 'Debe ser de tipo cadena de texto.',
-                'autor.max'      => 'Máximo 255 caracteres',
-
-                'anho.required' => 'El año es obligatorio.',
-                'anho.integer'  => 'Debe ser de tipo entero.',
-
-                'genero.required'      => 'El género es obligatorio.',
-                'editorial.required'   => 'la editorial es obligatoria.',
-                'descripcion.required'   => 'La descripción es obligatoria.',
-
-
+            $validated = $request->validate([
+                'titulo'      => 'required|string|max:255',
+                'autor'       => 'required|string|max:255',
+                'anho'        => 'required|integer',
+                'genero'      => 'required|string|max:255',
+                'descripcion' => 'required|string|max:1255',
             ]);
 
+            $libro = new Libro();
+
             
-        
+            $libro->titulo      = $request->input('titulo');;
+            $libro->autor       = $request->input('autor');;
+            $libro->anho        = $request->input('anho');;
+            $libro->genero      = $request->input('genero');;
+            $libro->descripcion = $request->input('descripcion');
+
+            $libro->save();   
             
-
-
-
-            $libro = empty($request->id)? new Libro() : Libro::find($request->id);
-
-            $libro->nombre      = $request->nombre;
-            $libro->autor       = $request->autor;
-            $libro->descripcion = $request->descripcion;
-            $libro->editorial   = $request->editorial;
-            $libro->anho        = $request->anho;
-            $libro->genero      = $request->genero;
-
-            $libro->save();
-
-
-            $salida = redirect()->route('libros.alta')->with([
-                    'success'  => 'Libro insertado correctamente.'
-                    ,'formData' => $libro
-                ]
-            );
+            $data['exito'] = 'Operación realiza correctamente';
 
         }
 
-        return $salida;
+
+        return view('libros.create',['datos' => $data]);
+    }
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
 }
+
+
