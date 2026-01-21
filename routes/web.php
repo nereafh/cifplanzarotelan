@@ -1,47 +1,61 @@
 <?php
-use App\Http\Controllers\ProfileController;
+
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\DatosController;
-use App\Http\Controllers\LibroController; //Para que funcionen las rutas
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Datos;
+use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\LibroController;
+
 
 
 Route::get('/', function () {
+
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::get('/login', function () {
+
+    return view('welcome');
+})->name('login');
+
+
+
+Route::get('/contacto', function () {
+
+    return "Página de contacto";
+})->name('contacto');
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/usuarios', function () {
+    // Tu lógica aquí
+    });
+
+    Route::get('/admin/configuracion ', function () {
+    // Tu lógica aquí
+    });
 });
 
 
 
+Route::post('/procesar-datos', [Datos::class, 'procesar']);
 
 
 
-Route::get('/libros', [LibroController::class, 'listado'])->name('libros.listado');
+Route::get('/procesar-datos', [Datos::class, 'procesar']);
 
 
-Route::get('/libro/{id}'            , [LibroController::class, 'mostrar'])->name('libros.mostrar');
-Route::get('/libro/actualizar/{id}' , [LibroController::class, 'actualizar'])->name('libros.actualizar');
-Route::get('/libro/eliminar/{id}'   , [LibroController::class, 'eliminar'])->name('libros.eliminar');
-Route::get('/libros/nuevo'          , [LibroController::class, 'alta'])->name('libros.alta');
-Route::post('/libros/nuevo'         , [LibroController::class, 'almacenar'])->name('libros.almacenar');
+Route::get('/usuario', [UsuarioController::class, 'index']);
+//Route::get('/usuario/{id}', [UsuarioController::class, 'show'])->name('usuario.show');
 
 
-
-
-
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-})->middleware('auth');
+Route::get('/usuario/store', [UsuarioController::class, 'store'])->name('usuario.store');
 
 
 
-require __DIR__.'/auth.php';
+Route::get('/libro', [LibroController::class, 'index'])->name('libro.index');
+Route::get('/libro/alta', [LibroController::class, 'create'])->name('libro.create');
+Route::post('/libro/alta', [LibroController::class, 'create'])->name('libro.create');
