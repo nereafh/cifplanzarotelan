@@ -22,6 +22,9 @@
                 <a class="nav-link active" aria-current="page" href="#">Home</a>
                 </li>
                 <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/libro">Libros</a>
+                </li>
+                <li class="nav-item">
                 <a class="nav-link" href="#">Link</a>
                 </li>
                 <li class="nav-item dropdown">
@@ -59,15 +62,16 @@
            <p class="alert alert-success"> {{ $datos['exito'] }} </p>
 
         @endif
-
-
+        
     
-        <form action="/libro/alta" method="POST">
+        <form action="/libro/{{ $oper }}" method="POST">
 
             @csrf
+
+            <input name="id" type="hidden" value="{{ $libro->id }}" />
             <div class="mb-3">
                 <label for="idtitulo" class="@error('titulo') text-danger @enderror form-label">Título</label>
-                <input value="{{ old('titulo') }}" type="text" name="titulo" class="@error('titulo') is-invalid @enderror form-control" id="idtitulo" aria-describedby="libroHelp">
+                <input {{ $disabled }} value="{{ old('titulo',$libro->titulo) }}" type="text" name="titulo" class="@error('titulo') is-invalid @enderror form-control" id="idtitulo" aria-describedby="libroHelp">
                 @error('titulo')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -76,7 +80,7 @@
 
             <div class="mb-3">
                 <label for="idautor" class="@error('autor') text-danger @enderror form-label">Autor</label>
-                <input  value="{{ old('autor') }}" type="text"  name="autor" class="@error('autor') is-invalid @enderror form-control" id="idautor" aria-describedby="autorHelp">
+                <input {{ $disabled }}  value="{{ old('autor',$libro->autor) }}" type="text"  name="autor" class="@error('autor') is-invalid @enderror form-control" id="idautor" aria-describedby="autorHelp">
                 @error('autor')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
@@ -85,11 +89,24 @@
             <div class="mb-3">
 
                 <label for="idanho" class="@error('anho') text-danger @enderror form-label">Año publicación</label>
-                <select class="@error('anho') is-invalid @enderror form-select" aria-label="2026" id="idanho" name="anho" aria-describedby="anhoHelp">
+                <select  {{ $disabled }} class="@error('anho') is-invalid @enderror form-select" aria-label="2026" id="idanho" name="anho" aria-describedby="anhoHelp">
                     <option></option>
-                    <option value="2024">2024</option>
-                    <option value="2025">2025</option>
-                    <option value="2026">2026</option>
+                    @php
+
+                        $options = '';
+                        for($anho= date('Y')-10; $anho <= date('Y'); $anho++)
+                        {
+                            $selected = $anho == $libro->anho ? 'selected' : '';
+
+                            $options .= "<option value=\"{$anho}\" {$selected}>{$anho}</option>";
+                        }
+
+                            //$selected = $clave_genero == $libro->genero ? 'selected' : '';
+                        echo $options;
+                    @endphp
+
+                   
+
                 </select>
                 @error('anho')
                     <span class="text-danger">{{ $message }}</span>
@@ -100,10 +117,18 @@
             <div class="mb-3">
 
                 <label for="idgenero" class="@error('genero') text-danger @enderror form-label">Género</label>
-                <select class="@error('genero') is-invalid @enderror form-select" aria-label="Horror" id="idgenero" name="genero" aria-describedby="generoHelp">
-                    <option></option>
-                    <option value="NV">Novela</option>
-                    <option value="SP">Suspense</option>
+                <select  {{ $disabled }} class="@error('genero') is-invalid @enderror form-select" aria-label="Horror" id="idgenero" name="genero" aria-describedby="generoHelp">
+
+                    @foreach ($cods_genero as $clave_genero => $texto_genero)    
+
+                        @php
+
+                            $selected = $clave_genero == $libro->genero ? 'selected' : '';
+
+                        @endphp
+
+                        <option value="{{ $clave_genero }}" {{ $selected }}>{{ $texto_genero }}</option>
+                    @endforeach
                 </select>
                 @error('genero')
                     <span class="text-danger">{{ $message }}</span>
@@ -113,13 +138,15 @@
 
             <div class="mb-3">
                 <label for="iddescripcion" class="@error('descripcion') text-danger @enderror form-label">Descripción</label>
-                <textarea class="@error('descripcion') is-invalid @enderror form-control" name="descripcion" id="iddescripcion" rows="3">{{ old('descripcion') }}</textarea>
+                <textarea  {{ $disabled }} class="@error('descripcion') is-invalid @enderror form-control" name="descripcion" id="iddescripcion" rows="3">{{ old('descripcion',$libro->descripcion) }}</textarea>
                 @error('descripcion')
                     <span class="text-danger">{{ $message }}</span>
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            @if (!$disabled)
+                <button type="submit" class="btn btn-primary">Submit</button>
+            @endif
         </form>
         
         <a class="btn btn-info mt-3" href="{{ route('libro.index') }}">Volver</a>

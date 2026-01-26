@@ -7,6 +7,9 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" integrity="sha384-tViUnnbYAV00FLIhhi3v/dWt3Jxw4gZQcNoSCxCIFNJVCx7/D55/wXsrNIRANwdD" crossorigin="anonymous">
+
 </head>
 <body>
 
@@ -20,6 +23,9 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
                 <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/libro">Libros</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="#">Link</a>
@@ -48,7 +54,11 @@
     </nav>
 
     <div class="container pt-4">
-    
+
+        @if($datos['exito'])
+        <p class="alert alert-success"> {{ $datos['exito'] }} </p>
+        @endif
+        
         <table class="table">
             <thead>
                 <tr>
@@ -63,10 +73,14 @@
             <tbody>
                 @foreach ($libros as $libro)                   
                     <tr>
-                        <th></th>
+                        <th>
+                            <a href="/libro/show/{{ $libro->id }}" class="btn btn-primary"><i class="bi bi-search"></i></a>
+                            <a href="/libro/edit/{{ $libro->id }}" class="btn btn-success"><i class="bi bi-pencil-square"></i></a>
+                            <a href="/libro/destroy/{{ $libro->id }}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que quieres borrar este libro?')"><i class="bi bi-trash"></i></a>
+                        </th>
                         <td>{{ $libro->titulo }}</td>
                         <td>{{ $libro->autor }}</td>
-                        <td>{{ $libro->genero }}</td>
+                        <td>{{ $cods_genero[$libro->genero] }}</td>
                         <td>{{ $libro->anho }}</td>
                         <td>{{ $libro->descripcion }}</td>
                     </tr>
