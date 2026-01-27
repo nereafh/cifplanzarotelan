@@ -5,6 +5,14 @@
 Organiza la lógica de toda la app en métodos/funciones, manejan las peticiones HTTP y responden
 Después ir a web.php a registrar las rutas 
 */
+
+/*
+Después de hacer los cambios, limpia la caché para que Laravel los reconozca:
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+php artisan optimize:clear
+*/
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -15,15 +23,8 @@ class LibroController extends Controller
     //
     public function index()
     {
-        $libros = Libro::all();
-
-        // Crea el array 'datos' igual que en las otras funciones
-        // Si viene de un destroy, 'session('exito')' tendrá el texto.
-        $datos = [
-            'exito' => session('exito', '') 
-        ];
-
-        return view('libros.index',['libros' => $libros,'cods_genero' => Libro::$cods_genero, 'datos' => $datos ]);// Pasar 'datos' a la vista]);
+        $libros = Libro::paginate(10);
+        return view('libros.index',['libros' => $libros,'cods_genero' => Libro::$cods_genero]);
     }
 
     public function create(Request $request)
@@ -94,6 +95,7 @@ class LibroController extends Controller
                 'descripcion' => 'required|string|max:1255',
             ]);
 
+            /*
             $datos_save = [];
             
             $datos_save['titulo']       = $request->input('titulo');;
@@ -104,18 +106,30 @@ class LibroController extends Controller
 
 
             Libro::where('id',$request->input('id'))->update($datos_save);
+            */
+            $libro = Libro::find($request->input('id'));
+
+            
+            $libro->titulo      = $request->input('titulo');;
+            $libro->autor       = $request->input('autor');;
+            $libro->anho        = $request->input('anho');;
+            $libro->genero      = $request->input('genero');;
+            $libro->descripcion = $request->input('descripcion');
+
+            $libro->save();   
             
             $datos['exito'] = 'Operación realiza correctamente';
-            $libro = new Libro();
-
+            
+            $disabled = 'disabled';
         }
         else
         {
             $datos = ['exito' => ''];
             $libro = Libro::find($id);
+            $disabled = '';
         }
 
-        return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => '','oper' => 'edit']);
+        return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit']);
     }
 
     /**
@@ -129,17 +143,44 @@ class LibroController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request,string $id='')
     {
-        //
-        // 1. Buscar el libro
-        $libro = Libro::findOrFail($id);
-    
-        // 2. Borrarlo
-        $libro->delete();
-    
-        // 3. Redirigir al listado con un mensaje de éxito
-        return redirect()->route('libro.index')->with('exito', 'Libro eliminado correctamente');    }
+       if ($request->isMethod('post')) {   
+
+            /*
+            $datos_save = [];
+            
+            $datos_save['titulo']       = $request->input('titulo');;
+            $datos_save['autor']        = $request->input('autor');;
+            $datos_save['anho']         = $request->input('anho');;
+            $datos_save['genero']       = $request->input('genero');;
+            $datos_save['descripcion']  = $request->input('descripcion');
+
+
+            Libro::where('id',$request->input('id'))->update($datos_save);
+
+            */
+
+            $libro = Libro::find($request->input('id'));
+
+            
+            $libro->delete();
+            
+            return redirect()->route('libro.index');
+            
+        }
+        else
+        {
+            $datos = ['exito' => ''];
+            $libro = Libro::find($id);
+            $disabled = 'disabled';
+
+            return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'destroy']);
+        }
+
+
+
+  }
 }
 
 
