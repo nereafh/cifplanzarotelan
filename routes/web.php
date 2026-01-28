@@ -9,35 +9,26 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\LibroController;
 
 
-
 Route::get('/', function () {
-
     return view('welcome');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/login', function () {
-
-    return view('welcome');
-})->name('login');
-
-
-
-Route::get('/contacto', function () {
-
-    return "Página de contacto";
-})->name('contacto');
-
-
-Route::middleware(['auth'])->group(function () {
-    Route::get('/admin/usuarios', function () {
-    // Tu lógica aquí
-    });
-
-    Route::get('/admin/configuracion ', function () {
-    // Tu lógica aquí
-    });
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+require __DIR__.'/auth.php';
+
+
+Route::get('/admin', function () {
+return view('admin.dashboard');
+})->middleware('auth');
 
 
 
@@ -53,8 +44,6 @@ Route::get('/usuario', [UsuarioController::class, 'index']);
 
 
 Route::get('/usuario/store', [UsuarioController::class, 'store'])->name('usuario.store');
-
-
 
 
 
