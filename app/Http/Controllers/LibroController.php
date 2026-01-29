@@ -53,9 +53,17 @@ class LibroController extends Controller
             $libro->save();   
             
             $data['exito'] = 'Operación realiza correctamente';
+            $disabled = 'disabled';
+
+            if ($request->input('modo') == 'ajax') {
+                return view('libros.create', ['datos' => $data, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
+            }
 
         }
         $libro = new Libro();
+        if ($request->input('modo') == 'ajax') {
+            return view('libros.create', ['datos' => $data, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
+        }
 
         return view('libros.create',['datos' => $data,'libro' => $libro,'cods_genero' => Libro::$cods_genero, 'disabled' => '','oper' => 'create']);
     }
@@ -70,12 +78,15 @@ class LibroController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, Request $request)
     {
         //
         $datos = ['exito' => ''];
         $libro = Libro::find($id);
 
+        if ($request->input('modo') == 'ajax') {
+            return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => 'disabled','oper' => 'show'])->render();
+        }
         return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => 'disabled','oper' => 'show']);
     }
 
@@ -119,8 +130,10 @@ class LibroController extends Controller
             $libro->save();   
             
             $datos['exito'] = 'Operación realiza correctamente';
-            
             $disabled = 'disabled';
+            if ($request->input('modo') == 'ajax') {
+                return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit'])->render();
+            }
         }
         else
         {
@@ -128,7 +141,9 @@ class LibroController extends Controller
             $libro = Libro::find($id);
             $disabled = '';
         }
-
+        if ($request->input('modo') == 'ajax') {
+            return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit'])->render();
+        }
         return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit']);
     }
 
@@ -145,6 +160,8 @@ class LibroController extends Controller
      */
     public function destroy(Request $request,string $id='')
     {
+        $id_actual = $id ?: $request->input('id');
+        $libro = Libro::find($id_actual);
        if ($request->isMethod('post')) {   
 
             /*
@@ -161,17 +178,20 @@ class LibroController extends Controller
 
             */
 
-            $libro = Libro::find($request->input('id'));
-
+            if ($libro) { $libro->delete(); }
+            $datos = ['exito' => 'Operación realizada correctamente'];
             
-            $libro->delete();
-            
+            if ($request->input('modo') == 'ajax') {
+                return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => 'disabled','oper' => 'destroy'])->render();
+            }
             return redirect()->route('libro.index');
-            
         }
         else
         {
             $datos = ['exito' => ''];
+            if ($request->input('modo') == 'ajax') {
+                return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => 'disabled','oper' => 'destroy'])->render();
+            }
             $libro = Libro::find($id);
             $disabled = 'disabled';
 

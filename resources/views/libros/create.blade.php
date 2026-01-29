@@ -1,111 +1,92 @@
-@extends('layout')
-@section('title', 'Formulario de libro')
-@section('contenido')
+@if(request()->input('modo') == 'ajax')
+    {{-- Si es AJAX, no hacemos nada arriba, solo el contenido --}}
+@else
+    @extends('layout')
+    @section('contenido')
+@endif
 
 <div class="container pt-4">
-    <ul>
-    @foreach ($errors->all() as $error)
-        <li  class="text-danger">{{ $error }}</li>
-    @endforeach
-    </ul>
-
-    @if($datos['exito'])
-
-        <p class="alert alert-success"> {{ $datos['exito'] }} </p>
-
+    {{-- Bloque de errores --}}
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
-
+    {{-- Mensaje de éxito --}}
+    @if(isset($datos['exito']) && $datos['exito'])
+        <p class="alert alert-success"> {{ $datos['exito'] }} </p>
+    @endif
 
     <form action="/libro/{{ $oper }}" method="POST">
-
         @csrf
-
         <input name="id" type="hidden" value="{{ $libro->id }}" />
+        
+        {{-- Título --}}
         <div class="mb-3">
-            <label for="idtitulo" class="@error('titulo') text-danger @enderror form-label">Título</label>
-            <input {{ $disabled }} value="{{ old('titulo',$libro->titulo) }}" type="text" name="titulo" class="@error('titulo') is-invalid @enderror form-control" id="idtitulo" aria-describedby="libroHelp">
-            @error('titulo')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-            <div id="libroHelp" class="form-text">El título del libro.</div>
+            <label for="idtitulo" class="form-label @error('titulo') text-danger @enderror">Título</label>
+            <input {{ $disabled }} value="{{ old('titulo', $libro->titulo) }}" type="text" name="titulo" class="form-control @error('titulo') is-invalid @enderror" id="idtitulo">
         </div>
 
+        {{-- Autor --}}
         <div class="mb-3">
-            <label for="idautor" class="@error('autor') text-danger @enderror form-label">Autor</label>
-            <input {{ $disabled }}  value="{{ old('autor',$libro->autor) }}" type="text"  name="autor" class="@error('autor') is-invalid @enderror form-control" id="idautor" aria-describedby="autorHelp">
-            @error('autor')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-            <div id="autorHelp" class="form-text">El autor del libro.</div>
+            <label for="idautor" class="form-label @error('autor') text-danger @enderror">Autor</label>
+            <input {{ $disabled }} value="{{ old('autor', $libro->autor) }}" type="text" name="autor" class="form-control @error('autor') is-invalid @enderror" id="idautor">
         </div>
+
+        {{-- Año --}}
         <div class="mb-3">
-
-            <label for="idanho" class="@error('anho') text-danger @enderror form-label">Año publicación</label>
-            <select  {{ $disabled }} class="@error('anho') is-invalid @enderror form-select" aria-label="2026" id="idanho" name="anho" aria-describedby="anhoHelp">
-                <option></option>
-                @php
-
-                    $options = '';
-                    for($anho= date('Y')-10; $anho <= date('Y'); $anho++)
-                    {
-                        $selected = $anho == $libro->anho ? 'selected' : '';
-
-                        $options .= "<option value=\"{$anho}\" {$selected}>{$anho}</option>";
-                    }
-
-                        //$selected = $clave_genero == $libro->genero ? 'selected' : '';
-                    echo $options;
-                @endphp
-
-                
-
+            <label for="idanho" class="form-label @error('anho') text-danger @enderror">Año publicación</label>
+            <select {{ $disabled }} class="form-select @error('anho') is-invalid @enderror" id="idanho" name="anho">
+                <option value=""></option>
+                @for($anho = date('Y')-10; $anho <= date('Y'); $anho++)
+                    <option value="{{ $anho }}" {{ old('anho', $libro->anho) == $anho ? 'selected' : '' }}>{{ $anho }}</option>
+                @endfor
             </select>
-            @error('anho')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-            <div id="anhoHelp" class="form-text">El año en que se publicó el libro.</div>
         </div>
 
+        {{-- Género --}}
         <div class="mb-3">
-
-            <label for="idgenero" class="@error('genero') text-danger @enderror form-label">Género</label>
-            <select  {{ $disabled }} class="@error('genero') is-invalid @enderror form-select" aria-label="Horror" id="idgenero" name="genero" aria-describedby="generoHelp">
-
+            <label for="idgenero" class="form-label @error('genero') text-danger @enderror">Género</label>
+            <select {{ $disabled }} class="form-select @error('genero') is-invalid @enderror" id="idgenero" name="genero">
                 @foreach ($cods_genero as $clave_genero => $texto_genero)    
-
-                    @php
-
-                        $selected = $clave_genero == $libro->genero ? 'selected' : '';
-
-                    @endphp
-
-                    <option value="{{ $clave_genero }}" {{ $selected }}>{{ $texto_genero }}</option>
+                    <option value="{{ $clave_genero }}" {{ old('genero', $libro->genero) == $clave_genero ? 'selected' : '' }}>{{ $texto_genero }}</option>
                 @endforeach
             </select>
-            @error('genero')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
-            <div id="generoHelp" class="form-text">El género literario.</div>
         </div>
 
+        {{-- Descripción --}}
         <div class="mb-3">
-            <label for="iddescripcion" class="@error('descripcion') text-danger @enderror form-label">Descripción</label>
-            <textarea  {{ $disabled }} class="@error('descripcion') is-invalid @enderror form-control" name="descripcion" id="iddescripcion" rows="3">{{ old('descripcion',$libro->descripcion) }}</textarea>
-            @error('descripcion')
-                <span class="text-danger">{{ $message }}</span>
-            @enderror
+            <label for="iddescripcion" class="form-label @error('descripcion') text-danger @enderror">Descripción</label>
+            <textarea {{ $disabled }} class="form-control @error('descripcion') is-invalid @enderror" name="descripcion" id="iddescripcion" rows="3">{{ old('descripcion', $libro->descripcion) }}</textarea>
         </div>
 
         @if (!$disabled)
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         @endif
 
-        @if ($oper == 'destroy')
-            <button type="submit" class="btn btn-danger">Eliminar libro</button>
+        @if ($oper == 'destroy' && (empty($datos['exito'])))
+            <div class="alert alert-warning">¿Estás seguro de que quieres eliminar este libro?</div>
+            <button type="submit" class="btn btn-danger">Confirmar Borrado</button>
         @endif
     </form>
     
-    <a class="btn btn-info mt-3" href="{{ route('libro.index') }}">Volver</a>
+    <hr>
+
+    {{-- Botones de salida --}}
+    @if(request()->ajax() || request()->input('modo') == 'ajax')
+        <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Cerrar Ventana</button>
+    @else
+        <a class="btn btn-info mt-3" href="{{ route('libro.index') }}">Volver al listado</a>
+    @endif
 </div>
+
+@if(request()->input('modo') == 'ajax')
+@php die(); @endphp {{-- <--- ESTO ES LA CLAVE --}}
+@else
 @endsection
+@endif
