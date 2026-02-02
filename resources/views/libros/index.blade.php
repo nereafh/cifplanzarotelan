@@ -12,6 +12,7 @@
                 <th scope="col">Autor</th>
                 <th scope="col">Género</th>
                 <th scope="col">Año</th>
+                <th scope="col">Descripcion</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +31,7 @@
                     <td>{{ $cods_genero[trim($libro->genero)] ?? 'Error con la clave: ['.$libro->genero.']' }}</td>
                     <!--  {{ $cods_genero[$libro->genero] }} -->
                     <td>{{ $libro->anho }}</td>
+                    <td>{{ $libro->descripcion }}</td>
                 </tr>
             @endforeach
 
@@ -39,7 +41,6 @@
 
         </tbody>
     </table>
-    {{ $libros->links() }}
     <button type="button" class="btn btn-primary" onclick="cargarOperacion('', 'create')">Nuevo Libro</button>
 
 

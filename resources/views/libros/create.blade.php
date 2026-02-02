@@ -6,8 +6,9 @@
 @endif
 
 <div class="container pt-4">
-    {{-- Bloque de errores --}}
-    @if ($errors->any())
+    {{-- Bloque de errores 
+    
+        @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
                 @foreach ($errors->all() as $error)
@@ -16,6 +17,10 @@
             </ul>
         </div>
     @endif
+    
+    
+    --}}
+
 
     {{-- Mensaje de éxito --}}
     @if(isset($datos['exito']) && $datos['exito'])
@@ -30,12 +35,14 @@
         <div class="mb-3">
             <label for="idtitulo" class="form-label @error('titulo') text-danger @enderror">Título</label>
             <input {{ $disabled }} value="{{ old('titulo', $libro->titulo) }}" type="text" name="titulo" class="form-control @error('titulo') is-invalid @enderror" id="idtitulo">
+            @error('titulo') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
         {{-- Autor --}}
         <div class="mb-3">
             <label for="idautor" class="form-label @error('autor') text-danger @enderror">Autor</label>
             <input {{ $disabled }} value="{{ old('autor', $libro->autor) }}" type="text" name="autor" class="form-control @error('autor') is-invalid @enderror" id="idautor">
+            @error('autor') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
         {{-- Año --}}
@@ -47,6 +54,7 @@
                     <option value="{{ $anho }}" {{ old('anho', $libro->anho) == $anho ? 'selected' : '' }}>{{ $anho }}</option>
                 @endfor
             </select>
+            @error('anho') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
         {{-- Género --}}
@@ -57,12 +65,14 @@
                     <option value="{{ $clave_genero }}" {{ old('genero', $libro->genero) == $clave_genero ? 'selected' : '' }}>{{ $texto_genero }}</option>
                 @endforeach
             </select>
+            @error('genero') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
         {{-- Descripción --}}
         <div class="mb-3">
             <label for="iddescripcion" class="form-label @error('descripcion') text-danger @enderror">Descripción</label>
             <textarea {{ $disabled }} class="form-control @error('descripcion') is-invalid @enderror" name="descripcion" id="iddescripcion" rows="3">{{ old('descripcion', $libro->descripcion) }}</textarea>
+            @error('descripcion') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
         @if (!$disabled)
@@ -70,8 +80,8 @@
         @endif
 
         @if ($oper == 'destroy' && (empty($datos['exito'])))
-            <div class="alert alert-warning">¿Estás seguro de que quieres eliminar este libro?</div>
-            <button type="submit" class="btn btn-danger">Confirmar Borrado</button>
+        {{--  <div class="alert alert-warning">¿Estás seguro de que quieres eliminar este libro?</div> --}}
+            <button type="submit" class="btn btn-danger">Borrar</button>
         @endif
     </form>
     
@@ -79,7 +89,7 @@
 
     {{-- Botones de salida --}}
     @if(request()->ajax() || request()->input('modo') == 'ajax')
-        <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Cerrar Ventana</button>
+        <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Volver</button>
     @else
         <a class="btn btn-info mt-3" href="{{ route('libro.index') }}">Volver al listado</a>
     @endif

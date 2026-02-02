@@ -30,5 +30,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'nerea_fernandez@cifpzonzamas.es',
             'password' => Hash::make('12345678'),
         ]);
+
+        $this->call([
+        LibrosSeeder::class,
+        SociosSeeder::class, // <-- Añade esta línea
+    ]);
     }
 }

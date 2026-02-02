@@ -29,43 +29,62 @@ class LibroController extends Controller
 
     public function create(Request $request)
     {
-        $data = ['exito' =>''];
+        $libro = new Libro(); // O el modelo que use
+        $datos = ['exito' => ''];
+        $disabled = ''; 
+        $oper = 'create';
+        $cods_genero = Libro::$cods_genero;
 
         if ($request->isMethod('post')) {
-
+            try {
             $validated = $request->validate([
                 'titulo'      => 'required|string|max:255',
                 'autor'       => 'required|string|max:255',
                 'anho'        => 'required|integer',
                 'genero'      => 'required|string|max:255',
                 'descripcion' => 'required|string|max:1255',
+            ], 
+            [
+                'titulo.required' => 'El título es obligatorio.',
+                'autor.required'  => 'El autor es obligatorio.',
+                'anho.required'   => 'El año es obligatorio.',
+                'genero.required'   => 'El géner es obligatorio.',
+                'descripcion.required'   => 'La descripción es obligatoria.',
             ]);
 
             $libro = new Libro();
-
             
             $libro->titulo      = $request->input('titulo');;
             $libro->autor       = $request->input('autor');;
             $libro->anho        = $request->input('anho');;
             $libro->genero      = $request->input('genero');;
             $libro->descripcion = $request->input('descripcion');
-
             $libro->save();   
             
-            $data['exito'] = 'Operación realiza correctamente';
+            $datos['exito'] = 'Operación realiza correctamente';
             $disabled = 'disabled';
 
+            } catch (\Illuminate\Validation\ValidationException $e) {
+            // SI FALLA LA VALIDACIÓN Y ES AJAX: Devolvemos SOLO el formulario
             if ($request->input('modo') == 'ajax') {
-                return view('libros.create', ['datos' => $data, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
+                return view('libros.create', compact('libro', 'datos', 'disabled', 'oper', 'cods_genero'))
+                       ->withErrors($e->validator)
+                       ->render(); // Importante el render() para enviar solo HTML parcial
+            }
+        }
+    }
+            // SI ES PETICIÓN INICIAL (GET) Y ES AJAX
+            if ($request->input('modo') == 'ajax') {
+                return view('libros.create', ['datos' => $datos, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
             }
 
-        }
+        
         $libro = new Libro();
         if ($request->input('modo') == 'ajax') {
-            return view('libros.create', ['datos' => $data, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
+            return view('libros.create', ['datos' => $datos, 'libro' => $libro, 'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled, 'oper' => 'create'])->render();
         }
 
-        return view('libros.create',['datos' => $data,'libro' => $libro,'cods_genero' => Libro::$cods_genero, 'disabled' => '','oper' => 'create']);
+        return view('libros.create',['datos' => $datos,'libro' => $libro,'cods_genero' => Libro::$cods_genero, 'disabled' => '','oper' => 'create']);
     }
     /**
      * Store a newly created resource in storage.
@@ -96,14 +115,29 @@ class LibroController extends Controller
     public function edit(Request $request,string $id='')
     {
         //
-        if ($request->isMethod('post')) {   
+        // 1. Buscamos el libro (ya sea por URL o por el campo oculto del formulario)
+        $id_actual = $id ?: $request->input('id');
+        $libro = Libro::find($id_actual);
+        $datos = ['exito' => ''];
+        $disabled = ''; 
+        $oper = 'edit';
+        $cods_genero = Libro::$cods_genero;
 
+        if ($request->isMethod('post')) {   
+            try {
             $validated = $request->validate([
                 'titulo'      => 'required|string|max:255',
                 'autor'       => 'required|string|max:255',
                 'anho'        => 'required|integer',
                 'genero'      => 'required|string|max:255',
                 'descripcion' => 'required|string|max:1255',
+            ], 
+            [
+                'titulo.required' => 'El título es obligatorio.',
+                'autor.required'  => 'El autor es obligatorio.',
+                'anho.required'   => 'El año es obligatorio.',
+                'genero.required'   => 'El géner es obligatorio.',
+                'descripcion.required'   => 'La descripción es obligatoria.',
             ]);
 
             /*
@@ -126,26 +160,27 @@ class LibroController extends Controller
             $libro->anho        = $request->input('anho');;
             $libro->genero      = $request->input('genero');;
             $libro->descripcion = $request->input('descripcion');
-
             $libro->save();   
             
             $datos['exito'] = 'Operación realiza correctamente';
             $disabled = 'disabled';
+
+            } catch (\Illuminate\Validation\ValidationException $e) {
+            // 4. Si falla la validación en AJAX, devolvemos SOLO el trozo del formulario
             if ($request->input('modo') == 'ajax') {
-                return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit'])->render();
+                return view('libros.create', compact('libro', 'datos', 'disabled', 'oper', 'cods_genero'))
+                       ->withErrors($e->validator)
+                       ->render();
             }
         }
-        else
-        {
-            $datos = ['exito' => ''];
-            $libro = Libro::find($id);
-            $disabled = '';
-        }
-        if ($request->input('modo') == 'ajax') {
-            return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit'])->render();
-        }
-        return view('libros.create',['libro' => $libro,'datos' => $datos,'cods_genero' => Libro::$cods_genero, 'disabled' => $disabled,'oper' => 'edit']);
     }
+            
+    // Retorno para GET (Carga inicial con datos) o POST exitoso
+    if ($request->input('modo') == 'ajax') {
+        return view('libros.create', compact('libro', 'datos', 'disabled', 'oper', 'cods_genero'))->render();
+    }
+    
+    return view('libros.create', compact('libro', 'datos', 'disabled', 'oper', 'cods_genero'));    }
 
     /**
      * Update the specified resource in storage.
